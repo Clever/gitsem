@@ -35,16 +35,6 @@ func commit(message string) error {
 	return exec.Command("git", "commit", "-m", message).Run()
 }
 
-func commitMessage(message, version string) string {
-	if message == "" {
-		return version
-	} else if strings.Contains(message, "%s") {
-		return fmt.Sprintf(message, version)
-	} else {
-		return message
-	}
-}
-
 func tag(version string) error {
 	return exec.Command("git", "tag", version).Run()
 }

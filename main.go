@@ -10,6 +10,14 @@ import (
 	"path/filepath"
 )
 
+func commitMessage(message, version string) string {
+	if strings.Contains(message, "%s") {
+		return fmt.Sprintf(message, version)
+	} else {
+		return message
+	}
+}
+
 func getCurrentVersion(path string) (*semver.Version, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return &semver.Version{}, nil
@@ -23,6 +31,12 @@ func getCurrentVersion(path string) (*semver.Version, error) {
 
 const versionFileName = "VERSION"
 
+func exitWithError(message string) {
+	fmt.Fprintf(os.Stderr, message+"\n\n")
+	flag.Usage()
+	os.Exit(1)
+}
+
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s: [options] version\n\n", os.Args[0])
@@ -30,13 +44,17 @@ func main() {
 		fmt.Fprintf(os.Stderr, "options:\n")
 		flag.PrintDefaults()
 	}
-	message := flag.String("m", "", "commit message for version commit")
+	message := flag.String("m", "%s", "commit message for version commit")
 	help := flag.Bool("h", false, "print usage and exit")
 	flag.Parse()
 
 	if *help {
 		flag.Usage()
 		os.Exit(0)
+	}
+
+	if *message == "" {
+		exitWithError("missing message")
 	}
 
 	if clean, err := isRepoClean(); err != nil {
@@ -55,9 +73,7 @@ func main() {
 		log.Fatal(err)
 	}
 	if len(flag.Args()) != 1 {
-		fmt.Fprintf(os.Stderr, "missing version argument\n\n")
-		flag.Usage()
-		os.Exit(1)
+		exitWithError("missing version argument")
 	}
 
 	newVersion := flag.Args()[0]
