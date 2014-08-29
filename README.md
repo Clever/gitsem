@@ -2,6 +2,12 @@
 
 a command line utility for managing semantically versioned (semver) git tags
 
+## Installation
+
+```shell
+$ go get github.com/Clever/gitsem
+```
+
 ## Example
 ```shell
 $ gitsem patch
