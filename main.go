@@ -86,7 +86,7 @@ func main() {
 		version.Major++
 	default:
 		if version, err = semver.New(newVersion); err != nil {
-			log.Fatal(err)
+			log.Fatalf("failed to parse %s as semver: %s", newVersion, err.Error())
 		}
 	}
 
