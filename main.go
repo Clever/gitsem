@@ -73,7 +73,7 @@ func main() {
 		log.Fatal(err)
 	}
 	if len(flag.Args()) != 1 {
-		exitWithError("missing version argument")
+		exitWithError("gitsem takes exactly one non-flag argument: version")
 	}
 
 	newVersion := flag.Args()[0]
