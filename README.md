@@ -25,7 +25,7 @@ gitsem [options] version
 
 Run this in a git repository to bump the version and write the new data back to the VERSION file.
 
-The newversion argument should be a valid semver string, or a valid second argument to semver.inc (one of "patch", "minor", or "major").
+The newversion argument should be a valid semver string, or a field of a semver string (one of "patch", "minor", or "major").
 In the second case, the existing version will be incremented by 1 in the specified field.
 
 It will also create a version commit and tag, and fail if the repo is not clean.
