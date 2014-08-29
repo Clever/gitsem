@@ -8,14 +8,14 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func commitMessage(message, version string) string {
 	if strings.Contains(message, "%s") {
 		return fmt.Sprintf(message, version)
-	} else {
-		return message
 	}
+	return message
 }
 
 func getCurrentVersion(path string) (*semver.Version, error) {
