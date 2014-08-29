@@ -30,5 +30,5 @@ In the second case, the existing version will be incremented by 1 in the specifi
 
 It will also create a version commit and tag, and fail if the repo is not clean.
 
-If supplied with --message (shorthand: -m) config option, gitsem will use it as a commit message when creating a version commit.
+If supplied with -m config option, gitsem will use it as a commit message when creating a version commit.
 If the message config contains %s then that will be replaced with the resulting version number.
