@@ -1,16 +1,13 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"gopkg.in/blang/semver.v1"
 	"io/ioutil"
 	"log"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"strings"
 )
 
 func getCurrentVersion(path string) (*semver.Version, error) {
@@ -22,48 +19,6 @@ func getCurrentVersion(path string) (*semver.Version, error) {
 		return nil, err
 	}
 	return semver.New(string(contents))
-}
-
-func getRepoRoot() (string, error) {
-	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
-	result := &bytes.Buffer{}
-	cmd.Stdout = result
-	if err := cmd.Run(); err != nil {
-		return "", err
-	}
-	return strings.TrimSpace(result.String()), nil
-}
-
-func isRepoClean() (bool, error) {
-	cmd := exec.Command("git", "status", "-s")
-	result := &bytes.Buffer{}
-	cmd.Stdout = result
-	if err := cmd.Run(); err != nil {
-		return false, err
-	}
-	return result.String() == "", nil
-}
-
-func addFile(path string) error {
-	return exec.Command("git", "add", path).Run()
-}
-
-func commit(message string) error {
-	return exec.Command("git", "commit", "-m", message).Run()
-}
-
-func commitMessage(message, version string) string {
-	if message == "" {
-		return version
-	} else if strings.Contains(message, "%s") {
-		return fmt.Sprintf(message, version)
-	} else {
-		return message
-	}
-}
-
-func tag(version string) error {
-	return exec.Command("git", "tag", version).Run()
 }
 
 const versionFileName = "VERSION"
@@ -84,7 +39,7 @@ func main() {
 		log.Fatal("repo isn't clean")
 	}
 
-	root, err := getRepoRoot()
+	root, err := repoRoot()
 	if err != nil {
 		log.Fatal(err)
 	}
