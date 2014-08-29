@@ -24,6 +24,12 @@ func getCurrentVersion(path string) (*semver.Version, error) {
 const versionFileName = "VERSION"
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "Usage of %s: [options] version\n\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "version can be one of: newversion | patch | minor | major\n\n")
+		fmt.Fprintf(os.Stderr, "options:\n")
+		flag.PrintDefaults()
+	}
 	message := flag.String("m", "", "commit message for version commit")
 	help := flag.Bool("h", false, "print usage and exit")
 	flag.Parse()

@@ -12,8 +12,10 @@ $ gitsem minor
 ## Usage
 
 ```shell
-gitsem [<newversion> | major | minor | patch]
+gitsem [options] version
 ```
+
+`version` can be one of: `newversion | patch | minor | major`
 
 Run this in a git repository to bump the version and write the new data back to the VERSION file.
 
