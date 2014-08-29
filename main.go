@@ -104,4 +104,5 @@ func main() {
 	if err := tag(versionString); err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println(versionString)
 }
