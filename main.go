@@ -26,7 +26,7 @@ func getCurrentVersion(path string) (*semver.Version, error) {
 	if err != nil {
 		return nil, err
 	}
-	return semver.New(string(contents))
+	return semver.New(strings.TrimSpace(string(contents)))
 }
 
 const versionFileName = "VERSION"
