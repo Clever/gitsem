@@ -46,6 +46,7 @@ func main() {
 	}
 	message := flag.String("m", "%s", "commit message for version commit")
 	help := flag.Bool("h", false, "print usage and exit")
+	shouldTag := flag.Bool("tag", true, "whether or not to make a tag at the version commit")
 	flag.Parse()
 
 	if *help {
@@ -101,8 +102,10 @@ func main() {
 	if err := commit(*message); err != nil {
 		log.Fatal(err)
 	}
-	if err := tag(versionString); err != nil {
-		log.Fatal(err)
+	if *shouldTag {
+		if err := tag(versionString); err != nil {
+			log.Fatal(err)
+		}
 	}
 	fmt.Println(versionString)
 }
