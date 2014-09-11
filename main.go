@@ -37,6 +37,25 @@ func exitWithError(message string) {
 	os.Exit(1)
 }
 
+func bump(old *semver.Version, part string) *semver.Version {
+	// We don't want to mutate the input, but there's no Clone or Copy method on a semver.Version,
+	// so we make a new one by parsing the string version of the old one.
+	// We ignore any errors because we know it's valid semver.
+	new, _ := semver.New(old.String())
+	switch part {
+	case "major":
+		new.Major++
+		new.Minor = 0
+		new.Patch = 0
+	case "minor":
+		new.Minor++
+		new.Patch = 0
+	case "patch":
+		new.Patch++
+	}
+	return new
+}
+
 func main() {
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s: [options] version\n\n", os.Args[0])
@@ -79,12 +98,8 @@ func main() {
 
 	newVersion := flag.Args()[0]
 	switch newVersion {
-	case "patch":
-		version.Patch++
-	case "minor":
-		version.Minor++
-	case "major":
-		version.Major++
+	case "patch", "minor", "major":
+		version = bump(version, newVersion)
 	default:
 		if version, err = semver.New(newVersion); err != nil {
 			log.Fatalf("failed to parse %s as semver: %s", newVersion, err.Error())
