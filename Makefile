@@ -1,8 +1,8 @@
 SHELL := /bin/bash
 PKG = github.com/Clever/gitsem
-PKGS = $(PKG)
-VERSION := $(shell cat VERSION)
+PKGS := $(shell go list ./... | grep -v /vendor)
 EXECUTABLE := gitsem
+VERSION := $(shell cat VERSION)
 BUILDS := \
 	build/$(EXECUTABLE)-v$(VERSION)-darwin-amd64 \
 	build/$(EXECUTABLE)-v$(VERSION)-linux-amd64 \
@@ -10,7 +10,7 @@ BUILDS := \
 COMPRESSED_BUILDS := $(BUILDS:%=%.tar.gz)
 RELEASE_ARTIFACTS := $(COMPRESSED_BUILDS:build/%=release/%)
 
-.PHONY: test golint
+.PHONY: test golint build vendor
 
 GOVERSION := $(shell go version | grep 1.5)
 ifeq "$(GOVERSION)" ""
@@ -19,17 +19,25 @@ endif
 
 export GO15VENDOREXPERIMENT = 1
 
-golint:
-	@go get github.com/golang/lint/golint
+GOLINT := $(GOPATH)/bin/golint
+$(GOLINT):
+	go get github.com/golang/lint/golint
+
+GODEP := $(GOPATH)/bin/godep
+$(GODEP):
+	go get -u github.com/tools/godep
+
+build:
+	go build -o bin/$(EXECUTABLE) $(PKG)
 
 test: $(PKGS)
 
-$(PKGS): golint
+$(PKGS): $(GOLINT)
 	@go get -d -t $@
 	@gofmt -w=true $(GOPATH)/src/$@*/**.go
 ifneq ($(NOLINT),1)
 	@echo "LINTING..."
-	@PATH=$(PATH):$(GOPATH)/bin golint $(GOPATH)/src/$@*/**.go
+	@$(GOLINT) $(GOPATH)/src/$@*/**.go
 	@echo ""
 endif
 ifeq ($(COVERAGE),1)
@@ -59,14 +67,6 @@ release: $(RELEASE_ARTIFACTS)
 
 clean:
 	rm -rf build release
-
-
-SHELL := /bin/bash
-PKGS := $(shell go list ./... | grep -v /vendor)
-GODEP := $(GOPATH)/bin/godep
-
-$(GODEP):
-	go get -u github.com/tools/godep
 
 vendor: $(GODEP)
 	$(GODEP) save $(PKGS)
