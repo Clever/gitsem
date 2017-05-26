@@ -15,7 +15,7 @@ RELEASE_ARTIFACTS := $(COMPRESSED_BUILDS:build/%=release/%)
 
 .PHONY: test golint build vendor
 
-$(eval $(call golang-version-check,1.7))
+$(eval $(call golang-version-check,1.8))
 
 test: $(PKGS)
 
