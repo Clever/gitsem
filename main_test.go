@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/blang/semver.v1"
+	"gopkg.in/blang/semver.v3"
 	"testing"
 )
 

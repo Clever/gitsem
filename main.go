@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gopkg.in/blang/semver.v1"
+	"gopkg.in/blang/semver.v3"
 	"io/ioutil"
 	"log"
 	"os"
@@ -47,11 +47,27 @@ func bump(old *semver.Version, part string) *semver.Version {
 		new.Major++
 		new.Minor = 0
 		new.Patch = 0
+		new.Pre = nil
 	case "minor":
 		new.Minor++
 		new.Patch = 0
+		new.Pre = nil
 	case "patch":
 		new.Patch++
+		new.Pre = nil
+	case "pre":
+		if len(new.Pre) > 1 {
+			exitWithError("Unknown pre-release format. Must be only one.")
+		}
+		if len(new.Pre) == 0 {
+			pre := semver.PRVersion{}
+			pre.VersionNum = 0
+			pre.IsNum = true
+			new.Pre = []semver.PRVersion{pre}
+		}
+		if new.Pre[0].IsNum {
+			new.Pre[0].VersionNum++
+		}
 	}
 	return new
 }
@@ -65,11 +81,17 @@ func main() {
 	}
 	message := flag.String("m", "%s", "commit message for version commit")
 	help := flag.Bool("h", false, "print usage and exit")
+	versionFlag := flag.Bool("v", false, "print tool version")
 	shouldTag := flag.Bool("tag", true, "whether or not to make a tag at the version commit")
 	flag.Parse()
 
 	if *help {
 		flag.Usage()
+		os.Exit(0)
+	}
+
+	if *versionFlag {
+		fmt.Println("1.1.0")
 		os.Exit(0)
 	}
 
@@ -98,7 +120,7 @@ func main() {
 
 	newVersion := flag.Args()[0]
 	switch newVersion {
-	case "patch", "minor", "major":
+	case "patch", "minor", "major", "pre":
 		version = bump(version, newVersion)
 	default:
 		if version, err = semver.New(newVersion); err != nil {
@@ -112,8 +134,8 @@ func main() {
 	if err := addFile(versionFile); err != nil {
 		log.Fatal(err)
 	}
-	versionString := "v" + version.String()
-	*message = commitMessage(*message, versionString)
+	versionString := version.String()
+	*message = commitMessage(*message, "v"+versionString)
 	if err := commit(*message); err != nil {
 		log.Fatal(err)
 	}

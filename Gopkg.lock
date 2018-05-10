@@ -7,14 +7,14 @@
   revision = "2160c81a963bc827f650a9d420263d05d35bb97e"
 
 [[projects]]
-  name = "gopkg.in/blang/semver.v1"
+  name = "gopkg.in/blang/semver.v3"
   packages = ["."]
-  revision = "0d739aeb6a95fcba66f10d2532ec17064088e7af"
-  version = "v1.1.0"
+  revision = "2ee87856327ba09384cabd113bc6b5d174e9ec0f"
+  version = "v3.5.1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4e22bcb681c3f5f08663da2d66397b0074ce8430b8136411bc3796cfcaea941d"
+  inputs-digest = "32a509fee98eb55e0666acea3516832efa7d8f7c17ff6aa9e4b65446fdc96211"
   solver-name = "gps-cdcl"
   solver-version = 1
