@@ -26,3 +26,5 @@ gitsem
 
 bin/
 vendor/
+release/
+build/

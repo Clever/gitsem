@@ -44,8 +44,7 @@ $(RELEASE_ARTIFACTS): release/% : build/%
 release: $(RELEASE_ARTIFACTS)
 
 clean:
-	rm -rf build release
-
+	rm -rf build release vendor bin
 
 install_deps: golang-dep-vendor-deps
 	$(call golang-dep-vendor)
