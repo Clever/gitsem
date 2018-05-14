@@ -37,37 +37,40 @@ func exitWithError(message string) {
 	os.Exit(1)
 }
 
-func bump(old *semver.Version, part string) *semver.Version {
+func bump(old *semver.Version, part string, isPreRelease bool) *semver.Version {
 	// We don't want to mutate the input, but there's no Clone or Copy method on a semver.Version,
 	// so we make a new one by parsing the string version of the old one.
 	// We ignore any errors because we know it's valid semver.
 	new, _ := semver.New(old.String())
-	switch part {
-	case "major":
-		new.Major++
-		new.Minor = 0
-		new.Patch = 0
-		new.Pre = nil
-	case "minor":
-		new.Minor++
-		new.Patch = 0
-		new.Pre = nil
-	case "patch":
-		new.Patch++
-		new.Pre = nil
-	case "pre":
-		if len(new.Pre) > 1 {
+	if !isPreRelease || len(new.Pre) == 0 {
+		switch part {
+		case "major":
+			new.Major++
+			new.Minor = 0
+			new.Patch = 0
+			new.Pre = nil
+		case "minor":
+			new.Minor++
+			new.Patch = 0
+			new.Pre = nil
+		case "patch":
+			new.Patch++
+			new.Pre = nil
+		}
+	}
+	if isPreRelease {
+		preRelease := new.Pre
+		if len(preRelease) > 1 {
 			exitWithError("Unknown pre-release format. Must be only one.")
 		}
-		if len(new.Pre) == 0 {
-			pre := semver.PRVersion{}
-			pre.VersionNum = 0
-			pre.IsNum = true
-			new.Pre = []semver.PRVersion{pre}
+		if len(preRelease) == 0 {
+			pre, _ := semver.NewPRVersion("0")
+			preRelease = []semver.PRVersion{pre}
 		}
-		if new.Pre[0].IsNum {
-			new.Pre[0].VersionNum++
+		if preRelease[0].IsNum {
+			preRelease[0].VersionNum++
 		}
+		new.Pre = preRelease
 	}
 	return new
 }
@@ -82,6 +85,7 @@ func main() {
 	message := flag.String("m", "%s", "commit message for version commit")
 	help := flag.Bool("h", false, "print usage and exit")
 	versionFlag := flag.Bool("v", false, "print tool version")
+	prereleaseFlag := flag.Bool("p", false, "create pre-release version")
 	shouldTag := flag.Bool("tag", true, "whether or not to make a tag at the version commit")
 	flag.Parse()
 
@@ -120,8 +124,8 @@ func main() {
 
 	newVersion := flag.Args()[0]
 	switch newVersion {
-	case "patch", "minor", "major", "pre":
-		version = bump(version, newVersion)
+	case "patch", "minor", "major":
+		version = bump(version, newVersion, *prereleaseFlag)
 	default:
 		if version, err = semver.New(newVersion); err != nil {
 			log.Fatalf("failed to parse %s as semver: %s", newVersion, err.Error())
