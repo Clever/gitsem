@@ -28,6 +28,13 @@ var bumpTests = []struct {
 	{Old: "1.0.0-1", New: "1.0.0-2", Change: "major", isPreRelease: true},
 	{Old: "1.1.1-1", New: "1.1.1-2", Change: "minor", isPreRelease: true},
 	{Old: "1.1.1-1", New: "1.1.1-2", Change: "patch", isPreRelease: true},
+
+	{Old: "1.0.0-1", New: "1.0.0", Change: "major", isPreRelease: false},
+	{Old: "1.1.0-1", New: "2.0.0", Change: "major", isPreRelease: false},
+	{Old: "1.1.1-1", New: "2.0.0", Change: "major", isPreRelease: false},
+	{Old: "1.1.0-1", New: "1.1.0", Change: "minor", isPreRelease: false},
+	{Old: "1.1.1-1", New: "1.2.0", Change: "minor", isPreRelease: false},
+	{Old: "1.1.1-1", New: "1.1.1", Change: "patch", isPreRelease: false},
 }
 
 func TestBump(t *testing.T) {

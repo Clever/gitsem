@@ -45,16 +45,22 @@ func bump(old *semver.Version, part string, isPreRelease bool) *semver.Version {
 	if !isPreRelease || len(new.Pre) == 0 {
 		switch part {
 		case "major":
-			new.Major++
+			if len(new.Pre) == 0 || (new.Minor > 0 || new.Patch > 0) {
+				new.Major++
+			}
 			new.Minor = 0
 			new.Patch = 0
 			new.Pre = nil
 		case "minor":
-			new.Minor++
+			if len(new.Pre) == 0 || new.Patch > 0 {
+				new.Minor++
+			}
 			new.Patch = 0
 			new.Pre = nil
 		case "patch":
-			new.Patch++
+			if len(new.Pre) == 0 {
+				new.Patch++
+			}
 			new.Pre = nil
 		}
 	}
