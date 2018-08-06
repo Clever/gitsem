@@ -2,7 +2,7 @@ include golang.mk
 .DEFAULT_GOAL := test # override default goal set in library makefile
 
 SHELL := /bin/bash
-PKG := github.com/Clever/gitsem
+PKG := github.com/eloo/gitsem
 PKGS := $(shell go list ./... | grep -v /vendor)
 EXECUTABLE := gitsem
 VERSION := $(shell cat VERSION)

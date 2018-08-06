@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gopkg.in/blang/semver.v3"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/blang/semver.v3"
 )
 
 func commitMessage(message, version string) string {
@@ -93,6 +94,7 @@ func main() {
 	versionFlag := flag.Bool("v", false, "print tool version")
 	prereleaseFlag := flag.Bool("p", false, "create pre-release version")
 	shouldTag := flag.Bool("tag", true, "whether or not to make a tag at the version commit")
+	skipRepoCheck := flag.Bool("skip-repo-check", false, "whether or not check if repo is clean")
 	flag.Parse()
 
 	if *help {
@@ -109,10 +111,12 @@ func main() {
 		exitWithError("missing message")
 	}
 
-	if clean, err := isRepoClean(); err != nil {
-		log.Fatal(err)
-	} else if !clean {
-		log.Fatal("repo isn't clean")
+	if !*skipRepoCheck {
+		if clean, err := isRepoClean(); err != nil {
+			log.Fatal(err)
+		} else if !clean {
+			log.Fatal("repo isn't clean")
+		}
 	}
 
 	root, err := repoRoot()
