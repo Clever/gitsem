@@ -95,6 +95,7 @@ func main() {
 	prereleaseFlag := flag.Bool("p", false, "create pre-release version")
 	shouldTag := flag.Bool("tag", true, "whether or not to make a tag at the version commit")
 	skipRepoCheck := flag.Bool("skip-repo-check", false, "whether or not check if repo is clean")
+	dryRun := flag.Bool("dry-run", false, "only compute version and print it")
 	flag.Parse()
 
 	if *help {
@@ -111,7 +112,7 @@ func main() {
 		exitWithError("missing message")
 	}
 
-	if !*skipRepoCheck {
+	if !*skipRepoCheck && !*dryRun {
 		if clean, err := isRepoClean(); err != nil {
 			log.Fatal(err)
 		} else if !clean {
@@ -142,20 +143,22 @@ func main() {
 		}
 	}
 
-	if err := ioutil.WriteFile(versionFile, []byte(version.String()), 0666); err != nil {
-		log.Fatal(err)
-	}
-	if err := addFile(versionFile); err != nil {
-		log.Fatal(err)
-	}
 	versionString := version.String()
-	*message = commitMessage(*message, "v"+versionString)
-	if err := commit(*message); err != nil {
-		log.Fatal(err)
-	}
-	if *shouldTag {
-		if err := tag(versionString); err != nil {
+	if !*dryRun {
+		if err := ioutil.WriteFile(versionFile, []byte(version.String()), 0666); err != nil {
 			log.Fatal(err)
+		}
+		if err := addFile(versionFile); err != nil {
+			log.Fatal(err)
+		}
+		*message = commitMessage(*message, "v"+versionString)
+		if err := commit(*message); err != nil {
+			log.Fatal(err)
+		}
+		if *shouldTag {
+			if err := tag(versionString); err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 	fmt.Println(versionString)
