@@ -68,6 +68,7 @@ func main() {
 	help := flag.Bool("h", false, "print usage and exit")
 	shouldTag := flag.Bool("tag", true, "whether or not to make a tag at the version commit")
 	annotate := flag.Bool("annotate", true, "whether or not to make the tag an annotated tag")
+	dryrun := flag.Bool("dry-run", false, "see next version with out making commits")
 	flag.Parse()
 
 	if *help {
@@ -98,6 +99,7 @@ func main() {
 		exitWithError("gitsem takes exactly one non-flag argument: version")
 	}
 
+	previousVersion := *version
 	newVersion := flag.Args()[0]
 	switch newVersion {
 	case "patch", "minor", "major":
@@ -108,13 +110,25 @@ func main() {
 		}
 	}
 
+	versionString := "v" + version.String()
+
+	if *dryrun {
+		// quit early and print result
+		fmt.Println("Dry run.")
+		fmt.Println("Your current version is:")
+		fmt.Println("v" + previousVersion.String())
+		fmt.Println("Your next version would be:")
+		fmt.Println(versionString)
+		os.Exit(0)
+	}
+
 	if err := ioutil.WriteFile(versionFile, []byte(version.String()), 0666); err != nil {
 		log.Fatal(err)
 	}
 	if err := addFile(versionFile); err != nil {
 		log.Fatal(err)
 	}
-	versionString := "v" + version.String()
+
 	*message = commitMessage(*message, versionString)
 	if err := commit(*message); err != nil {
 		log.Fatal(err)
@@ -124,5 +138,6 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+
 	fmt.Println(versionString)
 }
