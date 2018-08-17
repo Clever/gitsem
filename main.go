@@ -3,12 +3,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gopkg.in/blang/semver.v1"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"gopkg.in/blang/semver.v1"
 )
 
 func commitMessage(message, version string) string {
@@ -66,6 +67,7 @@ func main() {
 	message := flag.String("m", "%s", "commit message for version commit")
 	help := flag.Bool("h", false, "print usage and exit")
 	shouldTag := flag.Bool("tag", true, "whether or not to make a tag at the version commit")
+	annotate := flag.Bool("annotate", true, "whether or not to make the tag an annotated tag")
 	flag.Parse()
 
 	if *help {
@@ -118,7 +120,7 @@ func main() {
 		log.Fatal(err)
 	}
 	if *shouldTag {
-		if err := tag(versionString); err != nil {
+		if err := tag(versionString, *annotate); err != nil {
 			log.Fatal(err)
 		}
 	}

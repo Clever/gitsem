@@ -34,6 +34,12 @@ func commit(message string) error {
 	return exec.Command("git", "commit", "-m", message).Run()
 }
 
-func tag(version string) error {
-	return exec.Command("git", "tag", version).Run()
+func tag(version string, annotate bool) error {
+	var cmd *exec.Cmd
+	if annotate {
+		cmd = exec.Command("git", "tag", "-a", version, "-m", version)
+	} else {
+		cmd = exec.Command("git", "tag", version)
+	}
+	return cmd.Run()
 }
