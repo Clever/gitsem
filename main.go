@@ -69,6 +69,7 @@ func main() {
 	shouldTag := flag.Bool("tag", true, "whether or not to make a tag at the version commit")
 	annotate := flag.Bool("annotate", true, "whether or not to make the tag an annotated tag")
 	dryrun := flag.Bool("dry-run", false, "see next version with out making commits")
+	verbose := flag.Bool("v", false, "verbose output")
 	flag.Parse()
 
 	if *help {
@@ -114,10 +115,12 @@ func main() {
 
 	if *dryrun {
 		// quit early and print result
-		fmt.Println("Dry run.")
-		fmt.Println("Your current version is:")
-		fmt.Println("v" + previousVersion.String())
-		fmt.Println("Your next version would be:")
+		if *verbose {
+			fmt.Println("Dry run.")
+			fmt.Println("Your current version is:")
+			fmt.Println("v" + previousVersion.String())
+			fmt.Println("Your next version would be:")
+		}
 		fmt.Println(versionString)
 		os.Exit(0)
 	}
